@@ -3,7 +3,10 @@
 
 The object-oriented data treating of the database.
 
-A father class "Match" and a son class "Event".
+A father class "Match" containing all the information of a football match.
+A father class "Event" containing the information of a event in a specific match, like goal, penalty, foul.
+A son class "Substitution" inherited from the "Event", which contains information of a substitution.
+A son class "Attempt" inherited from the "Event", which contains information of an attempt.
 
 @author: Mingyu LIAO
 """
