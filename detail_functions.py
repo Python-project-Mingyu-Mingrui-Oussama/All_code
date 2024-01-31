@@ -11,11 +11,15 @@ import pandas
 from PIL import Image, ImageTk
 from class_file import Match
 from class_file import Event
+from class_file import Shoot
 from data import extract_all_location
 from data import calculate_heat_map
 from data import calculate_attack_distribution
+from data import calculate_pass_distribution
 from data import extract_two_team
-
+from data import extract_all_pass
+from data import extract_all_shoot
+from data import calculate_shoot_map
 
 def heat_funct(heat_map) :
 # Charger l'image du terrain de football
@@ -242,10 +246,11 @@ def passes_function(matrix)   :
 
     # Mettre à jour l'affichage de la figure dans la fenêtre Tkinter
     
-def pourcentage_victoire(home_team, away_team, historique_rencontres):
+def pourcentage_victoire(home_team, away_team):
     # Calcul du pourcentage en se basant sur l'historique, les matchs gagnés et les buts marqués
     pourcentage_home = 0.6  # Valeur initiale pour l'équipe à domicile (peut être ajustée)
-
+    
+    historique_rencontres = extract_two_team(home_team, away_team)
     # Influence de l'historique des rencontres
     for match in historique_rencontres:
         if match.ht == home_team:
@@ -275,6 +280,111 @@ def pourcentage_victoire(home_team, away_team, historique_rencontres):
     pourcentage_away = 1 - pourcentage_home
 
     return pourcentage_home, pourcentage_away
+
+def but(Liste_rate,Liste_goal) :
+        # Charger l'image du but
+        but_image = Image.open("but.jpg")  # Remplacez par le chemin de votre image du but
+        but_width, but_height = but_image.size
+        
+        
+        x_shots = [160,250 , 400 , 550, 250 , 400 , 550,650 , 400 , 400]  # Coordonnées x des tirs
+        y_shots = [215, 250,250,250 , 190,190,190,215 , 335 , 292]  # Coordonnées y des tirs
+        x_goal=[]
+        y_goal=[]
+        # Affichage de l'image du but
+        plt.imshow(but_image, extent=[0, but_width, 0, but_height])
+        
+        nbr_rate=Liste_rate[0]
+        plt.text(165  , 180, str(nbr_rate), fontsize=20, color='red')
+        
+        
+        nbr_rate=Liste_rate[1]
+        nbr_goal=Liste_goal[1]
+        
+        if nbr_goal !=0 :
+            x_goal.append(250)
+            y_goal.append(250)
+            plt.text(205  , 210, str(nbr_goal), fontsize=20, color='blue')
+        plt.text(255  , 210, str(nbr_rate), fontsize=20, color='red')
+        
+        nbr_rate=Liste_rate[2]
+        nbr_goal=Liste_goal[2]
+        
+        if nbr_goal !=0 :
+            x_goal.append(400)
+            y_goal.append(250)
+            plt.text(355  , 210, str(nbr_goal), fontsize=20, color='blue')
+        plt.text(405 , 210, str(nbr_rate), fontsize=20, color='red')
+        
+        
+        nbr_rate=Liste_rate[3]
+        nbr_goal=Liste_goal[3]
+        
+        if nbr_goal !=0 :
+            x_goal.append(550)
+            y_goal.append(250)
+            plt.text(510  , 210, str(nbr_goal), fontsize=20, color='blue')
+        plt.text(555  , 210, str(nbr_rate), fontsize=20, color='red')
+        
+        nbr_rate=Liste_rate[5]
+        nbr_goal=Liste_goal[5]
+        
+        if nbr_goal !=0 :
+            x_goal.append(400)
+            y_goal.append(190)
+            plt.text(355  , 150, str(nbr_goal), fontsize=20, color='blue')
+        plt.text(405  , 150, str(nbr_rate), fontsize=20, color='red')
+        
+        
+        nbr_rate=Liste_rate[4]
+        nbr_goal=Liste_goal[4]
+        
+        if nbr_goal !=0 :
+            x_goal.append(250)
+            y_goal.append(190)
+            plt.text(205  , 150, str(nbr_goal), fontsize=20, color='blue')
+        plt.text(255 , 150, str(nbr_rate), fontsize=20, color='red')
+        
+        
+        
+        nbr_rate=Liste_rate[6]
+        nbr_goal=Liste_goal[6]
+        
+        if nbr_goal !=0 :
+            x_goal.append(550)
+            y_goal.append(190)
+            plt.text(510  , 150, str(nbr_goal), fontsize=20, color='blue')
+        plt.text(555  , 150, str(nbr_rate), fontsize=20, color='red')
+        
+        nbr_rate=Liste_rate[7]
+        plt.text(655  , 180, str(nbr_rate), fontsize=20, color='red')
+        nbr_rate=Liste_rate[8]
+        plt.text(405  , 325, str(nbr_rate), fontsize=20, color='red')
+        nbr_rate=Liste_rate[9]
+        plt.text(405  , 285,str(nbr_rate), fontsize=20, color='red')
+        
+        
+        
+        # Affichage des tirs sur l'image du but
+        
+        plt.scatter(x_shots, y_shots, color='red', marker='x', label='Tirs', s=100)
+        plt.scatter(x_goal, y_goal, color='blue', marker='o', label='Tirs', s=200, facecolors='none')
+        
+        
+        
+        
+        
+        # Affichage du nombre de tirs dans la zone spécifique du but
+        
+        
+        # Configuration du titre, des étiquettes, etc.
+        #plt.axis('off')
+        plt.title('Visualisation des tirs dans une zone spécifique du but')
+        plt.xlabel('Position en x sur le but')
+        plt.ylabel('Position en y sur le but')
+        plt.grid(False)
+        plt.show()
+
     
 # Example usage:
 if __name__ == "__main__":
@@ -286,9 +396,17 @@ if __name__ == "__main__":
     location_objects = extract_all_location(id_odsp)
     heat_map = calculate_heat_map(location_objects)
     heat_funct(heat_map)
-    matrix = calculate_attack_distribution(location_objects)
-    attaques(matrix)
-    passes_function(matrix)
+    
+    matrix_attack = calculate_attack_distribution(location_objects)
+    attaques(matrix_attack)
+    print('attack distribution:')
+    print(matrix_attack)
+    
+    pass_objects = extract_all_pass(location_objects)
+    matrix_pass = calculate_pass_distribution(pass_objects)
+    passes_function(matrix_pass)
+    print('pass distribution:')
+    print(matrix_pass)
     
     name1 = 'Bordeaux'
     name2 = 'Lyon'

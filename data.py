@@ -364,7 +364,43 @@ def calculate_total_score(team_name):
             
     return score
     
-
+def calculate_win_draw_lose(name1, name2=None):
+    win = [0,0,0]
+    if name2 == None:
+        match_history=extract_one_team(name1)
+        for item in match_history:
+            if item.ht == name1:
+                if item.htscore > item.atscore:
+                    win[0] +=1
+                if item.htscore == item.atscore:
+                    win[1] +=1
+                if item.htscore < item.atscore:
+                    win[2] +=1
+            if item.at == name1:
+                if item.htscore > item.atscore:
+                    win[2] +=1
+                if item.htscore == item.atscore:
+                    win[1] +=1
+                if item.htscore < item.atscore:
+                    win[0] +=1
+    else:
+        match_history=extract_two_team(name1,name2)
+        for item in match_history:
+            if item.ht == name1:
+                if item.htscore > item.atscore:
+                    win[0] +=1
+                if item.htscore == item.atscore:
+                    win[1] +=1
+                if item.htscore < item.atscore:
+                    win[2] +=1
+            if item.at == name1:
+                if item.htscore > item.atscore:
+                    win[2] +=1
+                if item.htscore == item.atscore:
+                    win[1] +=1
+                if item.htscore < item.atscore:
+                    win[0] +=1
+    return win
 
 
 # Example usage:
@@ -373,6 +409,7 @@ if __name__ == "__main__":
     id_odsp='UFot0hit/'
     events_chosen = events[events['id_odsp'] == id_odsp]
     location_objects = extract_all_location(id_odsp)
+    
     shoot_objects = extract_all_shoot(id_odsp)
     shoot_map,is_goal = calculate_shoot_map(shoot_objects)
     print('shoot map:')
@@ -401,9 +438,14 @@ if __name__ == "__main__":
     total_score = calculate_total_score(name2)
     print('total score:')
     print(total_score)
-
-
-
+    
+    win = calculate_win_draw_lose(name2)
+    print('win/draw/lose:')
+    print(win)
+    
+    win = calculate_win_draw_lose(name1,name2)
+    print('win/draw/lose:')
+    print(win)
 
 
 
