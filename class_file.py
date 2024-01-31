@@ -3,10 +3,7 @@
 
 The object-oriented data treating of the database.
 
-A father class "Match" containing all the information of a football match.
-A father class "Event" containing the information of a event in a specific match, like goal, penalty, foul.
-A son class "Substitution" inherited from the "Event", which contains information of a substitution.
-A son class "Attempt" inherited from the "Event", which contains information of an attempt.
+A father class "Match" and a son class "Event".
 
 @author: Mingyu LIAO
 """
@@ -168,6 +165,25 @@ class Event():
             return True
         else:
             return False
+        
+class Shoot:
+    def __init__(self, id_odsp=None, id_event=None, minutes=None, sorted_time=None, shot_place=None, shot_outcome=None, is_goal=None):
+        self.id_odsp = id_odsp
+        self.id_event = id_event
+        self.minutes = minutes
+        self.sorted_time = sorted_time
+        self.shot_place = shot_place
+        self.shot_outcome = shot_outcome
+        self.is_goal = is_goal
+        
+    def set_shoot_data(self, data):
+        self.id_odsp = data[0]
+        self.id_event = data[1]
+        self.minutes = data[3]
+        self.sorted_time = data[2]
+        self.shot_place = data[14]
+        self.shot_outcome = data[15]
+        self.is_goal = data[16]
             
 class Attempt(Event):
     def __init__(self, shot_place=None, shot_outcome=None, is_goal=None, location=None, bodypart=None, assist_method=None, situation=None, **kwargs):

@@ -14,6 +14,7 @@ import pandas
 import csv
 from class_file import Match
 from class_file import Event
+from class_file import Shoot
 
 results = pandas.read_csv("archive/ginf.csv")   #read the database
 events = pandas.read_csv("archive/events.csv")   #read the database
@@ -83,7 +84,21 @@ def extract_all_pass(location_objects):
             location_objects.remove(item)
     return location_objects
 
-
+def extract_all_shoot(id_odsp):
+    
+    shoot_objects = []
+    events_chosen = events[events['id_odsp'] == id_odsp]
+    shoots = pandas.DataFrame(columns=events_chosen.columns)
+    
+    for index, value in enumerate(events_chosen['shot_place']):
+        if not pandas.isna(value) and isinstance(value, (float, np.float64)):
+            shoots = shoots.append(events_chosen.iloc[index])
+            
+    for index,row in shoots.iterrows():
+        shoot_object = Shoot()
+        shoot_object.set_shoot_data(row)
+        shoot_objects.append(shoot_object)
+    return shoot_objects
 
 
 
@@ -249,6 +264,74 @@ def calculate_heat_map_advanced(location_objects):
     return heatmap
 '''
 
+def calculate_shoot_map(shoot_objects):
+    shoot_map=[0, 0, 0, 0, 4, 0, 0, 0,0, 0]
+    is_goal = [0, 0, 0, 0, 0, 0, 0, 0,0, 0]
+    '''
+    8	Misses to the left
+    12	Top left corner
+    11	top centre of the goal
+    13	Top right corner
+    3	Bottom left corner
+    5	Centre of the goal
+    4	Bottom right corner
+    9	Misses to the right
+    1	Bit too high
+    7	Hits the bar
+    '''
+    for item in shoot_objects:
+        if item.shot_place == 1:
+            shoot_map[8] +=1
+            if item.is_goal == 1:
+                is_goal[8] +=1
+        if item.shot_place == 3:
+            shoot_map[4] +=1
+            if item.is_goal == 1:
+                is_goal[4] +=1
+        if item.shot_place == 4:
+            shoot_map[6] +=1
+            if item.is_goal == 1:
+                is_goal[6] +=1
+        if item.shot_place == 5:
+            shoot_map[5] +=1
+            if item.is_goal == 1:
+                is_goal[5] +=1
+        if item.shot_place == 6:
+            shoot_map[8] +=1
+            if item.is_goal == 1:
+                is_goal[8] +=1
+        if item.shot_place == 7:
+            shoot_map[9] +=1
+            if item.is_goal == 1:
+                is_goal[9] +=1
+        if item.shot_place == 8:
+            shoot_map[0] +=1
+            if item.is_goal == 1:
+                is_goal[0] +=1
+        if item.shot_place == 9:
+            shoot_map[7] +=1
+            if item.is_goal == 1:
+                is_goal[7] +=1
+        if item.shot_place == 10:
+            shoot_map[8] +=1
+            if item.is_goal == 1:
+                is_goal[8] +=1
+        if item.shot_place == 11:
+            shoot_map[2] +=1
+            if item.is_goal == 1:
+                is_goal[2] +=1
+        if item.shot_place == 12:
+            shoot_map[1] +=1
+            if item.is_goal == 1:
+                is_goal[1] +=1
+        if item.shot_place == 13:
+            shoot_map[4] +=3
+            if item.is_goal == 1:
+                is_goal[4] +=1
+    
+    
+    return shoot_map,is_goal
+
 def extract_one_team(name):
     match_history = []
     matches = results[(results['ht'].astype(str) == name) | (results['at'].astype(str) == name)]
@@ -270,16 +353,34 @@ def extract_two_team(home_team, away_team):
     
     return match_history
 
-
+def calculate_total_score(team_name):
+    score =0
+    match_history=extract_one_team(team_name)
+    for item in match_history:
+        if item.at == team_name:
+            score = score + item.atscore
+        if item.ht == team_name:
+            score = score + item.htscore
+            
+    return score
+    
 
 
 
 # Example usage:
 if __name__ == "__main__":
     
-    id_odsp= 'newuFc20/'
+    id_odsp='UFot0hit/'
     events_chosen = events[events['id_odsp'] == id_odsp]
     location_objects = extract_all_location(id_odsp)
+    shoot_objects = extract_all_shoot(id_odsp)
+    shoot_map,is_goal = calculate_shoot_map(shoot_objects)
+    print('shoot map:')
+    print(shoot_map)
+    print('is goal:')
+    print(is_goal)
+    
+    
     attack_distribition = calculate_attack_distribution(location_objects)
     print('attack distribution:')
     print(attack_distribition)
@@ -296,9 +397,10 @@ if __name__ == "__main__":
     
     name1 = 'Bordeaux'
     name2 = 'Lyon'
-    match_history = extract_two_team(name1,name2)
-    
-
+    match_history = extract_one_team(name2)
+    total_score = calculate_total_score(name2)
+    print('total score:')
+    print(total_score)
 
 
 
