@@ -196,18 +196,9 @@ def calculate_pass_distribution(location_objects):
     
     return output
     
-    
+'''
 def calculate_heat_map(location_objects):
-    '''
-    Parameters
-    ----------
-    location_objects : list of object Event
-
-    Returns
-    -------
-    output : a matrix which describes the heat map of home team and away team
-
-    '''
+    
     #initialization of heat map
     heatmap = np.array([[0, 0, 0, 0],             #upper side of heat map
                    [0, 0, 0, 0],                  #center side of heat map
@@ -238,8 +229,8 @@ def calculate_heat_map(location_objects):
     heatmap[1][1]= board[1][0]*0.1 + board[1][7] + board[1][4]*0.5 + board[1][11]     #home team right back
     
     return heatmap
-
-def calculate_heat_map_advanced(location_objects):
+'''
+def calculate_heat_map(location_objects):
     
     n = 12
     m = 16
@@ -254,7 +245,7 @@ def calculate_heat_map_advanced(location_objects):
             if obj.location == 2:
                 hm = generate_gaussian_matrix(12,8,sigma=5)
                 heatmap[:, :8] += hm
-            if obj.location == 3:
+            if (obj.location == 3)|(obj.location == 14):
                 hm = generate_gaussian_matrix(6,3,sigma=10)*0.5
                 heatmap[3:9, 13:16] += hm
             if (obj.location == 4) | (obj.location == 9):
@@ -266,6 +257,9 @@ def calculate_heat_map_advanced(location_objects):
             if obj.location == 10:
                 hm = generate_gaussian_matrix(3,5,sigma=10)
                 heatmap[3:6, 8:13] += hm
+            if obj.location == 12:
+                hm = generate_gaussian_matrix(3,5,sigma=10)
+                heatmap[6:9, 8:13] += hm
                 
                 
         if obj.side == 2:
@@ -275,7 +269,7 @@ def calculate_heat_map_advanced(location_objects):
             if obj.location == 2:
                 hm = generate_gaussian_matrix(12,8,sigma=5)
                 heatmap[:, 8:] += hm
-            if obj.location == 3:
+            if (obj.location == 3)|(obj.location == 14):
                 hm = generate_gaussian_matrix(6,3,sigma=10)*0.5
                 heatmap[3:9, :3] += hm
             if (obj.location == 4) | (obj.location == 9):
@@ -287,6 +281,9 @@ def calculate_heat_map_advanced(location_objects):
             if obj.location == 10:
                 hm = generate_gaussian_matrix(6,3,sigma=10)
                 heatmap[6:9, 3:8] += hm
+            if obj.location == 12:
+                hm = generate_gaussian_matrix(3,5,sigma=10)
+                heatmap[3:6, 3:8] += hm
     #home team side
     
     
@@ -296,8 +293,10 @@ def calculate_heat_map_advanced(location_objects):
 
 
 def calculate_shoot_map(shoot_objects):
-    shoot_map=[0, 0, 0, 0, 4, 0, 0, 0,0, 0]
-    is_goal = [0, 0, 0, 0, 0, 0, 0, 0,0, 0]
+    ht_shoot_map=[0, 0, 0, 0, 0, 0, 0, 0,0, 0]
+    ht_is_goal = [0, 0, 0, 0, 0, 0, 0, 0,0, 0]
+    at_shoot_map=[0, 0, 0, 0, 0, 0, 0, 0,0, 0]
+    at_is_goal = [0, 0, 0, 0, 0, 0, 0, 0,0, 0]
     '''
     8	Misses to the left
     12	Top left corner
@@ -311,6 +310,7 @@ def calculate_shoot_map(shoot_objects):
     7	Hits the bar
     '''
     for item in shoot_objects:
+            
         if item.shot_place == 1:
             shoot_map[8] +=1
             if item.is_goal == 1:
@@ -477,7 +477,7 @@ if __name__ == "__main__":
     print('pass distribution:')
     print(pass_distribition)
     
-    heat_map = calculate_heat_map_advanced(location_objects)
+    heat_map = calculate_heat_map(location_objects)
     print('heat map:')
     print(heat_map)
     

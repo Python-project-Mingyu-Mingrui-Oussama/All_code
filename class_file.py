@@ -167,12 +167,13 @@ class Event():
             return False
         
 class Shoot:
-    def __init__(self, id_odsp=None, id_event=None, minutes=None, sorted_time=None, shot_place=None, shot_outcome=None, is_goal=None):
+    def __init__(self, id_odsp=None, id_event=None, minutes=None, sorted_time=None, side=None, shot_place=None, shot_outcome=None, is_goal=None):
         self.id_odsp = id_odsp
         self.id_event = id_event
         self.minutes = minutes
         self.sorted_time = sorted_time
         self.shot_place = shot_place
+        self.side = side
         self.shot_outcome = shot_outcome
         self.is_goal = is_goal
         
@@ -181,6 +182,7 @@ class Shoot:
         self.id_event = data[1]
         self.minutes = data[3]
         self.sorted_time = data[2]
+        self.side = data[7]
         self.shot_place = data[14]
         self.shot_outcome = data[15]
         self.is_goal = data[16]
