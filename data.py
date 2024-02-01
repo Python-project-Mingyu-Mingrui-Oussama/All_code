@@ -238,31 +238,62 @@ def calculate_heat_map(location_objects):
     heatmap[1][1]= board[1][0]*0.1 + board[1][7] + board[1][4]*0.5 + board[1][11]     #home team right back
     
     return heatmap
-'''
+
 def calculate_heat_map_advanced(location_objects):
-        
+    
+    n = 12
+    m = 16
     #initialization of heat map
-    heatmap = np.zeros((8, 6))
+    heatmap = np.zeros((n, m))
     
     for obj in location_objects:
         if obj.side == 1:
             if obj.location == 1:
-                middle_col = matrix.shape[1] // 2
-                heatmap[:, middle_col:] += 0.1
+                hm = generate_gaussian_matrix(12,8,sigma=5)
+                heatmap[:, 8:] += hm
             if obj.location == 2:
-                middle_col = matrix.shape[1] // 2
-                heatmap[:, :middle_col] += 0.1
+                hm = generate_gaussian_matrix(12,8,sigma=5)
+                heatmap[:, :8] += hm
             if obj.location == 3:
-                heatmap
-            if obj.location == 4:
-        
+                hm = generate_gaussian_matrix(6,3,sigma=10)*0.5
+                heatmap[3:9, 13:16] += hm
+            if (obj.location == 4) | (obj.location == 9):
+                hm = generate_gaussian_matrix(6,8,sigma=2)
+                heatmap[:6, 8:] += hm
+            if (obj.location == 5)  | (obj.location == 11):
+                hm = generate_gaussian_matrix(6,8,sigma=2)
+                heatmap[6:, 8:] += hm
+            if obj.location == 10:
+                hm = generate_gaussian_matrix(3,5,sigma=10)
+                heatmap[3:6, 8:13] += hm
+                
+                
+        if obj.side == 2:
+            if obj.location == 1:
+                hm = generate_gaussian_matrix(12,8,sigma=5)
+                heatmap[:, :8] += hm
+            if obj.location == 2:
+                hm = generate_gaussian_matrix(12,8,sigma=5)
+                heatmap[:, 8:] += hm
+            if obj.location == 3:
+                hm = generate_gaussian_matrix(6,3,sigma=10)*0.5
+                heatmap[3:9, :3] += hm
+            if (obj.location == 4) | (obj.location == 9):
+                hm = generate_gaussian_matrix(6,3,sigma=2)
+                heatmap[6:, :8] += hm
+            if (obj.location == 5)  | (obj.location == 11):
+                hm = generate_gaussian_matrix(6,8,sigma=2)
+                heatmap[:6, :8] += hm
+            if obj.location == 10:
+                hm = generate_gaussian_matrix(6,3,sigma=10)
+                heatmap[6:9, 3:8] += hm
     #home team side
     
     
     
     
     return heatmap
-'''
+
 
 def calculate_shoot_map(shoot_objects):
     shoot_map=[0, 0, 0, 0, 4, 0, 0, 0,0, 0]
@@ -403,6 +434,25 @@ def calculate_win_draw_lose(name1, name2=None):
     return win
 
 
+def generate_gaussian_matrix(n, m, peak_value=1, peak_center=None, sigma=1):
+    if peak_center is None:
+        peak_center = (n // 2, m // 2)  # Default to the center of the matrix
+
+    x, y = np.meshgrid(np.arange(m), np.arange(n))
+    d = np.sqrt((x - peak_center[1]) ** 2 + (y - peak_center[0]) ** 2)
+    gaussian_matrix = peak_value * np.exp(-(d ** 2) / (2 * sigma ** 2))
+
+    # Ensure symmetry for even dimensions
+    if n % 2 == 0:
+        gaussian_matrix = (gaussian_matrix + np.flipud(gaussian_matrix)) / 2
+    if m % 2 == 0:
+        gaussian_matrix = (gaussian_matrix + np.fliplr(gaussian_matrix)) / 2
+
+    # Clip values to ensure the border is 0
+    gaussian_matrix = np.clip(gaussian_matrix, 0, None)
+
+    return gaussian_matrix
+
 # Example usage:
 if __name__ == "__main__":
     
@@ -427,7 +477,7 @@ if __name__ == "__main__":
     print('pass distribution:')
     print(pass_distribition)
     
-    heat_map = calculate_heat_map(location_objects)
+    heat_map = calculate_heat_map_advanced(location_objects)
     print('heat map:')
     print(heat_map)
     
@@ -447,6 +497,7 @@ if __name__ == "__main__":
     print('win/draw/lose:')
     print(win)
 
+    heatmap = generate_gaussian_matrix(12,16,sigma=10)
 
 
 

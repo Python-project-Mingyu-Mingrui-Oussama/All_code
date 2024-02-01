@@ -20,6 +20,8 @@ from data import extract_two_team
 from data import extract_all_pass
 from data import extract_all_shoot
 from data import calculate_shoot_map
+from data import calculate_win_draw_lose , calculate_total_score
+
 
 def heat_funct(heat_map) :
 # Charger l'image du terrain de football
@@ -248,33 +250,30 @@ def passes_function(matrix)   :
     
 def pourcentage_victoire(home_team, away_team):
     # Calcul du pourcentage en se basant sur l'historique, les matchs gagnés et les buts marqués
-    pourcentage_home = 0.6  # Valeur initiale pour l'équipe à domicile (peut être ajustée)
-    
-    historique_rencontres = extract_two_team(home_team, away_team)
+    pourcentage_home = 0.55  # Valeur initiale pour l'équipe à domicile (peut être ajustée)
+
     # Influence de l'historique des rencontres
-    for match in historique_rencontres:
-        if match.ht == home_team:
-            if match.htscore > match.atscore:
-                pourcentage_home += 0.1  # Ajouter 0.1 si l'équipe à domicile a gagné ce match dans l'historique
-            if match.htscore < match.atscore:
-                pourcentage_home -= 0.1  # Soustraire 0.1 si l'équipe à domicile a perdu ce match dans l'historique
-        if match.at == home_team:
-            if match.htscore < match.atscore:
-                pourcentage_home += 0.1  # Ajouter 0.1 si l'équipe à domicile a gagné ce match dans l'historique
-            if match.htscore > match.atscore:
-                pourcentage_home -= 0.1  # Soustraire 0.1 si l'équipe à domicile a perdu ce match dans l'historique
+    L=calculate_win_draw_lose(home_team,  away_team)
+    pourcentage_home= pourcentage_home+ L[0] * 0.01
+    pourcentage_home=pourcentage_home - L[2]*0.01
+    L_home=calculate_win_draw_lose(home_team)
+    L_away=calculate_win_draw_lose(away_team)
+    
+    C_home= L_home[0]-L_home[2]
+    C_away= L_away[0]-L_away[2]
     
     
     # Influence du nombre de matchs gagnés
-    #pourcentage_home += 0.01 * (matchs_gagnes_home - matchs_gagnes_away)
+    pourcentage_home += 0.0005 * (C_home - C_away)
+    buts_marques_home=calculate_total_score(home_team)
+    buts_marques_away=calculate_total_score(away_team)
+    
+    
 
     # Influence du nombre de buts marqués
-    #pourcentage_home += 0.005 * (buts_marques_home - buts_marques_away)
-    
-    
-
+    pourcentage_home += 0.0005 * (buts_marques_home - buts_marques_away)
     # Assurer que le pourcentage est dans la plage [0, 1]
-    #pourcentage_home = max(0, min(1, pourcentage_home))
+    pourcentage_home = max(0, min(1, pourcentage_home))
 
     # Calculer le pourcentage pour l'équipe à l'extérieur
     pourcentage_away = 1 - pourcentage_home
@@ -408,8 +407,8 @@ if __name__ == "__main__":
     print('pass distribution:')
     print(matrix_pass)
     
-    name1 = 'Bordeaux'
-    name2 = 'Lyon'
+    name1 = 'Lorient'
+    name2 = 'Paris Saint-Germain'
     match_history = extract_two_team(name1,name2)
     
-    [pourcentage_home, pourcentage_away] = pourcentage_victoire(name1, name2, match_history)
+    [pourcentage_home, pourcentage_away] = pourcentage_victoire(name1, name2)
